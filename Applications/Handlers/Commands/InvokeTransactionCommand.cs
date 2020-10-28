@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Applications.Handlers.Commands
 {
-   public class InvokeTransactionCommand:IRequest<BaseMessageResponse>
+   public class InvokeTransactionCommand:IRequest
     {
         public long UserId { get; set; }
         public int TransactionType { get; set; }
@@ -31,7 +31,7 @@ namespace Applications.Handlers.Commands
             RuleFor(c => c.TransactionType).NotEmpty();
         }
     }
-    public class InvokeTransactionCommandHanlder : IRequestHandler<InvokeTransactionCommand, BaseMessageResponse>
+    public class InvokeTransactionCommandHanlder : IRequestHandler<InvokeTransactionCommand>
     {
         private bool SendEmail(string to, string msg, string title)
         {
@@ -59,11 +59,11 @@ namespace Applications.Handlers.Commands
         {
             _dbContext = dbContext;
         }
-        public async Task<BaseMessageResponse> Handle(InvokeTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(InvokeTransactionCommand request, CancellationToken cancellationToken)
         {
             var user = await _dbContext.User.FirstOrDefaultAsync(c => c.Id == request.UserId);
-            if(user==null)
-                return Util.GetSimpleResponse(false, "User not found");
+            if (user == null)
+                throw new Exception("User not found");
             var transactionType = (TransactionType)request.TransactionType;
             var userTranactionSettings = user.TransactionType;
             if (userTranactionSettings == TransactionType.Both)
@@ -77,7 +77,7 @@ namespace Applications.Handlers.Commands
                     if ((CommMedium.Email == user.CommunitactionType) || (CommMedium.Both == user.CommunitactionType))
                         SendEmail(user.Email, $"A transaction of type {transactionType.ToString()} has occured on your account", "Notification");
             }
-            return Util.GetSimpleResponse(true, $"Task completed");
+        return Unit.Value;
         }
     }
 }
