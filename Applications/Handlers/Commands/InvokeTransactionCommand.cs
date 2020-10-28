@@ -68,13 +68,14 @@ namespace Applications.Handlers.Commands
             var userTranactionSettings = user.TransactionType;
             if (userTranactionSettings == TransactionType.Both)
             {
-                if (transactionType == user.TransactionType)
-                    SendEmail(user.Email, $"A transaction of type {transactionType.ToString()} has occured ob your account", "Notification");
+                if ((CommMedium.Email == user.CommunitactionType) || (CommMedium.Both == user.CommunitactionType))
+                     SendEmail(user.Email, $"A transaction of type {transactionType.ToString()} has occured on your account", "Notification");
             }
             else
             {
                 if(transactionType==user.TransactionType)
-                 SendEmail(user.Email, $"A transaction of type {transactionType.ToString()} has occured ob your account", "Notification");
+                    if ((CommMedium.Email == user.CommunitactionType) || (CommMedium.Both == user.CommunitactionType))
+                        SendEmail(user.Email, $"A transaction of type {transactionType.ToString()} has occured on your account", "Notification");
             }
             return Util.GetSimpleResponse(true, $"Task completed");
         }
